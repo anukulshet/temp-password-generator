@@ -1,12 +1,11 @@
 const { Pool } = require('pg');
 
 // Supabase provides a standard PostgreSQL connection string.
-// Set DATABASE_URL in your .env file — never commit the real value.
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
     // Supabase requires SSL; rejectUnauthorized can be true in production
-    // once you have the CA cert configured.
+
     rejectUnauthorized: false,
   },
   max: 10,              // max connections in the pool
