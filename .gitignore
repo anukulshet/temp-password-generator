@@ -1,4 +1,5 @@
-/.claude
-/CLAUDE.md
-/database
-/frontend
+node_modules/
+.env
+.env.local
+.claude/
+CLAUDE.md
