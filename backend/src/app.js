@@ -32,8 +32,10 @@ app.use(globalLimiter);
 
 // Routes
 app.use('/api/auth',      require('./routes/auth'));
-// app.use('/api/resources', require('./routes/resource'));  // Week 3
-// app.use('/api/access',    require('./routes/access'));    // Week 3
+app.use('/api/resources', require('./routes/resource'));
+app.use('/api/access',    require('./routes/access'));
+// app.use('/api/verify',    require('./routes/verify'));    // Week 6
+// app.use('/api/redirect',  require('./routes/redirect'));  // Week 6
 // app.use('/api/verify',    require('./routes/verify'));    // Week 6
 // app.use('/api/redirect',  require('./routes/redirect'));  // Week 6
 
