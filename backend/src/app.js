@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
 const { testConnection } = require('./config/database');
+const { deviceFingerprint } = require('./middleware/deviceFingerprint');
 
 const app = express();
 
@@ -29,13 +30,13 @@ const globalLimiter = rateLimit({
   message: { error: 'Too many requests, please try again later.' },
 });
 app.use(globalLimiter);
+app.use(deviceFingerprint);
 
 // Routes
 app.use('/api/auth',      require('./routes/auth'));
 app.use('/api/resources', require('./routes/resource'));
 app.use('/api/access',    require('./routes/access'));
-// app.use('/api/verify',    require('./routes/verify'));    // Week 6
-// app.use('/api/redirect',  require('./routes/redirect'));  // Week 6
+app.use('/api/audit',     require('./routes/audit'));
 // app.use('/api/verify',    require('./routes/verify'));    // Week 6
 // app.use('/api/redirect',  require('./routes/redirect'));  // Week 6
 

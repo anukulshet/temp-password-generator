@@ -8,6 +8,7 @@
 const { query }                                              = require('../config/database');
 const { createAccessToken, revokeToken }                     = require('../services/tokenEngine');
 const { registerExpiry, removeToken }                        = require('../services/expiryEngine');
+const { logEvent }                                           = require('../services/audit');
 
 // ── Create access token (Share Access) ───────────────────────────────────────
 
@@ -92,7 +93,13 @@ const revoke = async (req, res) => {
     const { tokenId } = req.params;
 
     await revokeToken(tokenId, req.userId);
-    await removeToken(tokenId); // remove from Redis immediately
+    await removeToken(tokenId);
+    await logEvent({
+      tokenId,
+      eventType:  'token_revoked',
+      ipAddress:  req.ipAddress,
+      deviceInfo: req.deviceInfo,
+    });
 
     return res.json({ message: 'Token revoked' });
   } catch (err) {
