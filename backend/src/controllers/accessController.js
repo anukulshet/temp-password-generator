@@ -9,6 +9,7 @@ const { query }                                              = require('../confi
 const { createAccessToken, revokeToken }                     = require('../services/tokenEngine');
 const { registerExpiry, removeToken }                        = require('../services/expiryEngine');
 const { logEvent }                                           = require('../services/audit');
+const { sendAccessEmail }                                    = require('../services/emailService');
 
 // ── Create access token (Share Access) ───────────────────────────────────────
 
@@ -20,9 +21,9 @@ const createToken = async (req, res) => {
       return res.status(400).json({ error: 'resourceId, recipientEmail and expiresInMinutes are required' });
     }
 
-    // Confirm resource belongs to this admin
+    // Confirm resource belongs to this admin and fetch enc_key_hex from JWT
     const { rows: resourceRows } = await query(
-      'SELECT id FROM resources WHERE id = $1 AND owner_id = $2',
+      'SELECT id, resource_name FROM resources WHERE id = $1 AND owner_id = $2',
       [resourceId, req.userId],
     );
 
@@ -36,18 +37,31 @@ const createToken = async (req, res) => {
       expiresInMinutes,
       maxUses:     maxUses     ?? 1,
       permissions: permissions ?? { access: 'full' },
+      encKeyHex:   req.encKeyHex, // stored so verify endpoint can decrypt credentials
     });
 
     // Register TTL in Redis for fast expiry checks
     await registerExpiry(record.id, record.expires_at);
 
-    // TODO Week 6: send email to recipientEmail with the access link
-    // The link will look like: https://accessos.app/verify?token=<rawToken>
+    const accessLink = `${process.env.FRONTEND_URL}/verify?token=${rawToken}`;
+    const resourceName = resourceRows[0].resource_name;
+
+    // Send email to recipient
+    try {
+      await sendAccessEmail({
+        to:           recipientEmail,
+        resourceName,
+        accessLink,
+        expiresIn:    `${expiresInMinutes} minutes`,
+      });
+    } catch (emailErr) {
+      console.warn('Email send failed (non-fatal):', emailErr.message);
+    }
 
     return res.status(201).json({
       message:    'Access token created',
       token:      record,
-      accessLink: `${process.env.FRONTEND_URL}/verify?token=${rawToken}`,
+      accessLink,
     });
   } catch (err) {
     console.error('createToken error:', err);

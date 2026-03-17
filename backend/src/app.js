@@ -12,9 +12,15 @@ const app = express();
 // Security headers
 app.use(helmet());
 
-// CORS — tighten origins in production
+// CORS — allow any localhost port in dev, lock to FRONTEND_URL in production
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    if (!origin || origin.startsWith('http://localhost') || origin === process.env.FRONTEND_URL) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 
@@ -37,8 +43,8 @@ app.use('/api/auth',      require('./routes/auth'));
 app.use('/api/resources', require('./routes/resource'));
 app.use('/api/access',    require('./routes/access'));
 app.use('/api/audit',     require('./routes/audit'));
-// app.use('/api/verify',    require('./routes/verify'));    // Week 6
-// app.use('/api/redirect',  require('./routes/redirect'));  // Week 6
+app.use('/api/verify',    require('./routes/verify'));
+app.use('/api/redirect',  require('./routes/redirect'));
 
 // Health check
 app.get('/health', (_req, res) => {

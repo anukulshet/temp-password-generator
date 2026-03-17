@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
+import Verify from './pages/Verify';
 
 // Redirect to login if not authenticated
 const PrivateRoute = ({ children }) => {
@@ -18,6 +19,7 @@ const AppRoutes = () => (
     <Routes>
       <Route path="/login"     element={<Login />} />
       <Route path="/signup"    element={<Signup />} />
+      <Route path="/verify"    element={<Verify />} />
       <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
       <Route path="/"          element={<Navigate to="/dashboard" replace />} />
     </Routes>

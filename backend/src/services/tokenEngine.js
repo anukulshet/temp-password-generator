@@ -46,16 +46,17 @@ const createAccessToken = async ({
   expiresInMinutes,
   maxUses = 1,
   permissions = { access: 'full' },
+  encKeyHex = null,
 }) => {
   const { rawToken, tokenHash } = generateToken();
   const expiresAt = new Date(Date.now() + expiresInMinutes * 60 * 1000);
 
   const { rows } = await query(
     `INSERT INTO access_tokens
-       (resource_id, token_hash, recipient_email, expires_at, max_uses, permissions)
-     VALUES ($1, $2, $3, $4, $5, $6)
+       (resource_id, token_hash, recipient_email, expires_at, max_uses, permissions, enc_key_hex)
+     VALUES ($1, $2, $3, $4, $5, $6, $7)
      RETURNING *`,
-    [resourceId, tokenHash, recipientEmail, expiresAt, maxUses, permissions],
+    [resourceId, tokenHash, recipientEmail, expiresAt, maxUses, permissions, encKeyHex],
   );
 
   return { rawToken, record: rows[0] };

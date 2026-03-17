@@ -12,7 +12,7 @@ const { encrypt, decrypt } = require('../services/encryption');
 
 const createResource = async (req, res) => {
   try {
-    const { resourceName, resourceUrl, username, password } = req.body;
+    const { resourceName, resourceUrl, username, password, loginUrl, usernameField, passwordField } = req.body;
 
     if (!resourceName || !resourceUrl || !username || !password) {
       return res.status(400).json({ error: 'resourceName, resourceUrl, username and password are required' });
@@ -25,10 +25,10 @@ const createResource = async (req, res) => {
     );
 
     const { rows } = await query(
-      `INSERT INTO resources (owner_id, resource_name, resource_url, encrypted_data)
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO resources (owner_id, resource_name, resource_url, encrypted_data, login_url, username_field, password_field)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING id, resource_name, resource_url, created_at`,
-      [req.userId, resourceName, resourceUrl, encryptedData],
+      [req.userId, resourceName, resourceUrl, encryptedData, loginUrl || null, usernameField || 'email', passwordField || 'password'],
     );
 
     return res.status(201).json({ resource: rows[0] });

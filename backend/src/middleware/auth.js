@@ -22,8 +22,9 @@ const authenticate = async (req, res, next) => {
     const token = header.slice(7); // strip "Bearer "
     const payload = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.userId = payload.sub;
-    req.encKey = await hexToKey(payload.encKeyHex); // ready for encrypt/decrypt calls
+    req.userId    = payload.sub;
+    req.encKeyHex = payload.encKeyHex;              // raw hex for storing on tokens
+    req.encKey    = await hexToKey(payload.encKeyHex); // Uint8Array for encrypt/decrypt
 
     next();
   } catch (err) {

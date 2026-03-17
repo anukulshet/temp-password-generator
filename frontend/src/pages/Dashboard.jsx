@@ -11,7 +11,7 @@ const Dashboard = () => {
 
   // New resource form
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ resourceName: '', resourceUrl: '', username: '', password: '' });
+  const [form, setForm] = useState({ resourceName: '', resourceUrl: '', username: '', password: '', loginUrl: '', usernameField: 'email', passwordField: 'password' });
   const [saving, setSaving] = useState(false);
 
   // Share modal
@@ -40,7 +40,7 @@ const Dashboard = () => {
     try {
       setSaving(true);
       await createResource(form);
-      setForm({ resourceName: '', resourceUrl: '', username: '', password: '' });
+      setForm({ resourceName: '', resourceUrl: '', username: '', password: '', loginUrl: '', usernameField: 'email', passwordField: 'password' });
       setShowForm(false);
       fetchResources();
     } catch (err) {
@@ -95,20 +95,43 @@ const Dashboard = () => {
       {showForm && (
         <form onSubmit={handleCreate} className="bg-white border border-gray-200 rounded-xl p-6 mb-6 space-y-4">
           <h2 className="font-semibold text-gray-800">New Resource</h2>
-          {['resourceName', 'resourceUrl', 'username', 'password'].map((field) => (
+          {[
+            { field: 'resourceName',  label: 'Resource Name',  required: true },
+            { field: 'resourceUrl',   label: 'Resource URL',   required: true },
+            { field: 'username',      label: 'Username',       required: true },
+            { field: 'password',      label: 'Password',       required: true },
+          ].map(({ field, label, required }) => (
             <div key={field}>
-              <label className="block text-sm font-medium text-gray-700 mb-1 capitalize">
-                {field.replace(/([A-Z])/g, ' $1')}
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
               <input
                 type={field === 'password' ? 'password' : 'text'}
-                required
+                required={required}
                 value={form[field]}
                 onChange={(e) => setForm({ ...form, [field]: e.target.value })}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
           ))}
+
+          <div className="border-t border-gray-100 pt-4">
+            <p className="text-xs text-gray-400 mb-3">Auto-login settings (optional — for seamless redirect)</p>
+            {[
+              { field: 'loginUrl',      label: 'Login Form URL',      placeholder: 'https://site.com/login' },
+              { field: 'usernameField', label: 'Username Field Name',  placeholder: 'email' },
+              { field: 'passwordField', label: 'Password Field Name',  placeholder: 'password' },
+            ].map(({ field, label, placeholder }) => (
+              <div key={field} className="mb-3">
+                <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+                <input
+                  type="text"
+                  placeholder={placeholder}
+                  value={form[field]}
+                  onChange={(e) => setForm({ ...form, [field]: e.target.value })}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+            ))}
+          </div>
           <div className="flex gap-3">
             <button type="submit" disabled={saving}
               className="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-50">
