@@ -12,6 +12,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@getbrevo/brevo": "^5.0.1",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
@@ -21,7 +22,6 @@
     "jsonwebtoken": "^9.0.3",
     "libsodium-wrappers-sumo": "^0.8.2",
     "pg": "^8.20.0",
-    "redis": "^5.11.0",
-    "resend": "^6.9.4"
+    "redis": "^5.11.0"
   }
 }
