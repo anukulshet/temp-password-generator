@@ -1,18 +1,17 @@
 /**
- * emailService.js — Send emails via Resend
- *
- * Resend free tier: 3,000 emails/month, 100/day.
- * Sign up at resend.com, get an API key, add it to .env as RESEND_API_KEY.
- * You also need a verified domain or use resend's test domain for dev.
+ * emailService.js — Send emails via Brevo
+ * Brevo free tier: 300 emails/day.
  */
 
-const { Resend } = require('resend');
+const { BrevoClient } = require('@getbrevo/brevo');
 
-// Initialise lazily so missing key doesn't crash on import
-let _resend = null;
-const getResend = () => {
-  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
-  return _resend;
+let _client = null;
+
+const getClient = () => {
+  if (!_client) {
+    _client = new BrevoClient({ apiKey: process.env.BREVO_API_KEY });
+  }
+  return _client;
 };
 
 /**
@@ -25,11 +24,16 @@ const getResend = () => {
  * @param {string} opts.expiresIn      - human readable e.g. "60 minutes"
  */
 const sendAccessEmail = async ({ to, resourceName, accessLink, expiresIn }) => {
-  const { data, error } = await getResend().emails.send({
-    from:    process.env.EMAIL_FROM || 'AccessOS <onboarding@resend.dev>',
-    to,
+  const client = getClient();
+
+  await client.transactionalEmails.sendTransacEmail({
+    sender: {
+      name:  process.env.FROM_NAME  || 'AccessOS',
+      email: process.env.FROM_EMAIL || 'no-reply@accessos.app',
+    },
+    to: [{ email: to }],
     subject: `You've been granted access to ${resourceName}`,
-    html: `
+    htmlContent: `
       <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 32px;">
         <h2 style="color: #4f46e5;">AccessOS</h2>
         <p>You've been granted temporary access to <strong>${resourceName}</strong>.</p>
@@ -47,13 +51,6 @@ const sendAccessEmail = async ({ to, resourceName, accessLink, expiresIn }) => {
       </div>
     `,
   });
-
-  if (error) {
-    console.error('Email send failed:', error);
-    throw new Error('Failed to send access email');
-  }
-
-  return data;
 };
 
 module.exports = { sendAccessEmail };
