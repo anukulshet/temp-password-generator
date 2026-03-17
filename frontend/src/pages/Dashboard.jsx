@@ -193,16 +193,18 @@ const Dashboard = () => {
 
             {shareLink ? (
               <div>
-                <p className="text-sm text-gray-600 mb-2">Share this link with the recipient:</p>
+                <p className="text-sm text-gray-600 mb-2">Access link generated:</p>
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-xs text-gray-700 break-all mb-4">
                   {shareLink}
                 </div>
-                <button
-                  onClick={() => { navigator.clipboard.writeText(shareLink); }}
-                  className="w-full bg-indigo-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 mb-2"
+                <a
+                  href={shareLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full bg-indigo-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 mb-2 text-center"
                 >
-                  Copy Link
-                </button>
+                  Open Link
+                </a>
                 <button onClick={() => { setShareTarget(null); setShareLink(''); }}
                   className="w-full text-sm text-gray-500 hover:text-gray-700 py-1">
                   Close
