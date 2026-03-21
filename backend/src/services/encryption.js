@@ -88,4 +88,15 @@ const hexToKey = async (hex) => {
   return s.from_hex(hex);
 };
 
-module.exports = { generateSalt, deriveKey, encrypt, decrypt, keyToHex, hexToKey };
+/**
+ * Generate a random temporary username + password.
+ * Username: user_ + 8 hex chars.  Password: 16 random bytes as URL-safe base64.
+ */
+const generateTempCredentials = async () => {
+  const s = await ready();
+  const tempUsername = 'user_' + s.to_hex(s.randombytes_buf(4));
+  const tempPassword = s.to_base64(s.randombytes_buf(16), s.base64_variants.URLSAFE_NO_PADDING);
+  return { tempUsername, tempPassword };
+};
+
+module.exports = { generateSalt, deriveKey, encrypt, decrypt, keyToHex, hexToKey, generateTempCredentials };
