@@ -55,6 +55,10 @@ export const getResource = (id) => api.get(`/resources/${id}`);
 
 export const createResource = (data) => api.post('/resources', data);
 
+export const updateResource = (id, data) => api.put(`/resources/${id}`, data);
+
+export const regenerateTempCredentials = (id) => api.post(`/resources/${id}/regenerate-temp`);
+
 export const deleteResource = (id) => api.delete(`/resources/${id}`);
 
 // ── Access Tokens ─────────────────────────────────────────────────────────────

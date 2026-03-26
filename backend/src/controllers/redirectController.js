@@ -92,13 +92,23 @@ const autoSubmitPage = ({ resourceName, loginUrl, usernameField, passwordField, 
     @keyframes spin { to { transform: rotate(360deg); } }
     h1 { font-size: 18px; color: #111827; margin-bottom: 8px; }
     p  { font-size: 14px; color: #6b7280; }
+    .fallback { display: none; margin-top: 24px; }
+    .fallback.show { display: block; }
+    .btn { display:inline-block; padding:12px 24px; background:#4f46e5; color:#fff;
+           border-radius:8px; text-decoration:none; font-weight:600; font-size:14px; }
+    .btn:hover { background:#4338ca; }
+    .hint { font-size:12px; color:#9ca3af; margin-top:12px; }
   </style>
 </head>
 <body>
   <div class="card">
-    <div class="spinner"></div>
+    <div class="spinner" id="spin"></div>
     <h1>Connecting to ${escHtml(resourceName)}</h1>
-    <p>Logging you in securely...</p>
+    <p id="status">Logging you in securely...</p>
+    <div class="fallback" id="fallback">
+      <a class="btn" href="${escHtml(resourceUrl)}" target="_blank">Open ${escHtml(resourceName)}</a>
+      <p class="hint">Auto-login isn't supported for this site.<br/>Use the credentials from your email or dashboard.</p>
+    </div>
   </div>
 
   <!-- Hidden form — credentials never visible to user -->
@@ -108,8 +118,14 @@ const autoSubmitPage = ({ resourceName, loginUrl, usernameField, passwordField, 
   </form>
 
   <script>
-    // Submit immediately — before the user can inspect the DOM
+    // Try auto-submit
     setTimeout(() => document.getElementById('f').submit(), 300);
+    // If still on this page after 3s, show fallback
+    setTimeout(() => {
+      document.getElementById('spin').style.display = 'none';
+      document.getElementById('status').textContent = 'Auto-login not available for this site.';
+      document.getElementById('fallback').classList.add('show');
+    }, 3000);
   </script>
 </body>
 </html>`;
